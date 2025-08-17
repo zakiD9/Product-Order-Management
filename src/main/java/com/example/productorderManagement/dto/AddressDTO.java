@@ -1,9 +1,8 @@
 package com.example.productorderManagement.dto;
-import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.example.productorderManagement.model.Address;
-import com.example.productorderManagement.model.User;
 
 import lombok.Data;
 
@@ -15,7 +14,7 @@ public class AddressDTO {
     private String city;
     private String state;
     private String zipCode;
-    private List<UserDTO> users;
+    private Set<UserDTO> users;
 
     public AddressDTO(Address address) {
         this.addressId = address.getAddressId();
@@ -26,6 +25,6 @@ public class AddressDTO {
         this.users = address.getUsers()
                         .stream()
                         .map(UserDTO::new)
-                        .collect(Collectors.toList());
+                        .collect(Collectors.toSet());
     }
 }
