@@ -7,4 +7,4 @@ import com.example.productorderManagement.model.OrderItem;
 
 @Repository
 public interface OrderItemRepository extends JpaRepository<OrderItem,Long>{
-}
+} 
