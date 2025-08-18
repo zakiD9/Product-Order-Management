@@ -10,14 +10,14 @@ import lombok.Data;
 
 @Data
 public class OrderDTO {
-    private Long orderItemId;
+    private Long orderId;
     private String username;
     private List<OrderItemDTO> orderItems;
     private Double amount;
     private OrderStatus status;
 
     public OrderDTO(Order order){
-        this.orderItemId = order.getOrderId();
+        this.orderId = order.getOrderId();
         this.orderItems = order.getOrderItems()
                            .stream()
                            .map(OrderItemDTO::new)

@@ -19,7 +19,8 @@ public class OrderItem {
     private Long orderItemId;
 
     private int quantity;
-    private double unitPrice;
+    private Double unitPrice;
+    private Double totalPrice;
 
     @ManyToOne
     @JoinColumn(name = "product_id")
@@ -30,4 +31,8 @@ public class OrderItem {
     private Order order;
 
     public OrderItem(){}
+
+    public Double setTotalPrice(int quantity ,Double unitPrice){
+        return quantity * unitPrice;
+    }
 }
