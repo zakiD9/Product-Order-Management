@@ -10,12 +10,14 @@ public class ProductDTO {
     private String productName;
     private String description;
     private Integer quantity;
+    private Double price;
 
     public ProductDTO(Product product){
         this.productId = product.getProductId();
         this.productName = product.getName();
         this.description = product.getDescription();
         this.quantity = product.getQuantity(); 
+        this.price = product.getPrice();
     }
     
 }
