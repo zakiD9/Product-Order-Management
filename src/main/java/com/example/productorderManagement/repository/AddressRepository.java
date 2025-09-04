@@ -17,5 +17,5 @@ public interface AddressRepository extends JpaRepository<Address,Long>{
         String state,
         String zipCode
     );
-    List <Address> findByUser(User user);
+    List <Address> findByUsers(User user);
 }

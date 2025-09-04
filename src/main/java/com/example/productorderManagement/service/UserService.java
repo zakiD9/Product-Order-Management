@@ -3,7 +3,6 @@ package com.example.productorderManagement.service;
 import java.time.LocalDate;
 import java.util.List;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.productorderManagement.dto.UserDTO;
@@ -18,10 +17,8 @@ import lombok.RequiredArgsConstructor;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
 
     public UserDTO createUser(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setCreatedAt(LocalDate.now());
 
         if (user.getRole() == null) {
@@ -57,13 +54,6 @@ public class UserService {
         return new UserDTO(saved);
     }
 
-    public void changePassword(Long id, String newPassword) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        user.setPassword(passwordEncoder.encode(newPassword));
-        userRepository.save(user);
-    }
 
     public void deleteUser(Long id) {
         if (!userRepository.existsById(id)) {

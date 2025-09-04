@@ -2,7 +2,12 @@ package com.example.productorderManagement.model;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -28,8 +33,13 @@ public class User {
     private String phoneNumber;
     private LocalDate createdAt;
 
-    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
-    private List<Address> Addresses;
+    @ManyToMany
+@JoinTable(
+    name = "user_address",
+    joinColumns = @JoinColumn(name = "user_id"),
+    inverseJoinColumns = @JoinColumn(name = "address_id")
+)
+private Set<Address> addresses = new HashSet<>();
 
     @Enumerated(EnumType.STRING)
     private Role role;

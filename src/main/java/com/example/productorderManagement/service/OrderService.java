@@ -2,9 +2,7 @@ package com.example.productorderManagement.service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import org.springframework.data.domain.jaxb.SpringDataJaxb.OrderDto;
 import org.springframework.stereotype.Service;
 
 import com.example.productorderManagement.dto.OrderDTO;

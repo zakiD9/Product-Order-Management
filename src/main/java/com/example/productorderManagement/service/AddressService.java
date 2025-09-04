@@ -43,15 +43,18 @@ public class AddressService {
     return new AddressDTO(savedAddress);
     }
 
-    public List<Address> getAllAddresses(){
-        return addressRepository.findAll();
+    public List<AddressDTO> getAllAddresses() {
+    List<Address> addresses = addressRepository.findAll();
+    return addresses.stream()
+            .map(AddressDTO::new)
+            .toList();
     }
 
     public List<AddressDTO> getAddressesByUserId(Long userId) {
     User user = userRepository.findById(userId)
             .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
 
-    List<Address> addresses = addressRepository.findByUser(user);
+    List<Address> addresses = addressRepository.findByUsers(user);
 
     return addresses.stream()
             .map(AddressDTO::new)
