@@ -32,5 +32,12 @@ public class Product {
     private Category category;
 
     public Product(){}
+
+    public Product(String name,String description,Double price ,Integer quantity){
+        this.name =name;
+    this.description =description;
+    this.price = price;
+    this.quantity = quantity;
+    }
     
 }

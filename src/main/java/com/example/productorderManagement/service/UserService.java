@@ -6,25 +6,57 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.example.productorderManagement.dto.UserDTO;
+import com.example.productorderManagement.model.Address;
 import com.example.productorderManagement.model.Role;
 import com.example.productorderManagement.model.User;
+import com.example.productorderManagement.repository.AddressRepository;
 import com.example.productorderManagement.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
-@RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
+    private final AddressRepository addressRepository;
 
-    public UserDTO createUser(User user) {
+    public UserService(UserRepository userRepository, AddressRepository addressRepository) {
+        this.userRepository = userRepository;
+        this.addressRepository = addressRepository;
+    }
+
+
+    public UserDTO createUser(User user ,Long addressId) {
         user.setCreatedAt(LocalDate.now());
 
         if (user.getRole() == null) {
             user.setRole(Role.CUSTOMER);
         }
+        if (addressId != null) {
+            Address address = addressRepository.findById(addressId)
+                .orElseThrow(() -> new RuntimeException("Address not found"));
+            user.getAddresses().add(address);
+        }
+        User saved = userRepository.save(user);
+        return new UserDTO(saved);
+    }
 
+    public UserDTO addAddressToUser(Long userId, Long addressId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        Address address = addressRepository.findById(addressId)
+            .orElseThrow(() -> new RuntimeException("Address not found"));
+        user.getAddresses().add(address);
+        User saved = userRepository.save(user);
+        return new UserDTO(saved);
+    }
+
+    public UserDTO removeAddressFromUser(Long userId, Long addressId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        Address address = addressRepository.findById(addressId)
+            .orElseThrow(() -> new RuntimeException("Address not found"));
+        user.getAddresses().remove(address);
         User saved = userRepository.save(user);
         return new UserDTO(saved);
     }

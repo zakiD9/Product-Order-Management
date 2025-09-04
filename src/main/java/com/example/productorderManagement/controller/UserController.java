@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.productorderManagement.dto.UserDTO;
@@ -28,9 +29,27 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserDTO> createUser(@RequestBody User user) {
-        UserDTO createdUser = userService.createUser(user);
+    public ResponseEntity<UserDTO> createUser(
+            @RequestBody User user,
+            @RequestParam(required = false) Long addressId) {
+        UserDTO createdUser = userService.createUser(user, addressId);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+    }
+
+    @PostMapping("/{userId}/address/{addressId}")
+    public ResponseEntity<UserDTO> addAddressToUser(
+            @PathVariable Long userId,
+            @PathVariable Long addressId) {
+        UserDTO updatedUser = userService.addAddressToUser(userId, addressId);
+        return ResponseEntity.ok(updatedUser);
+    }
+
+    @DeleteMapping("/{userId}/address/{addressId}")
+    public ResponseEntity<UserDTO> removeAddressFromUser(
+            @PathVariable Long userId,
+            @PathVariable Long addressId) {
+        UserDTO updatedUser = userService.removeAddressFromUser(userId, addressId);
+        return ResponseEntity.ok(updatedUser);
     }
 
     @GetMapping
