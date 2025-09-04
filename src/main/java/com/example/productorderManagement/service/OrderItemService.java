@@ -33,83 +33,86 @@ public class OrderItemService {
     }
 
     public OrderItemDTO addOrderItem(Long productId, Long orderId, Integer quantity) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ResourceNotFoundException("The product doesn't exist."));
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("The order doesn't exist."));
+    Product product = productRepository.findById(productId)
+            .orElseThrow(() -> new ResourceNotFoundException("The product doesn't exist."));
+    Order order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new ResourceNotFoundException("The order doesn't exist."));
 
-        if (order.getStatus() != OrderStatus.PENDING) {
-            throw new BadRequestException("You can only modify items for orders that are PENDING.");
-        }
-
-        if (product.getQuantity() < quantity) {
-            throw new BadRequestException("The quantity you want isn't available.");
-        }
-
-        Optional<OrderItem> existingItem = orderItemRepository.findByOrderAndProduct(order, product);
-
-        OrderItem orderItem;
-        if (existingItem.isPresent()) {
-            orderItem = existingItem.get();
-            orderItem.setQuantity(orderItem.getQuantity() + quantity);
-        } else {
-            orderItem = new OrderItem();
-            orderItem.setOrder(order);
-            orderItem.setProduct(product);
-            orderItem.setQuantity(quantity);
-            orderItem.setUnitPrice(product.getPrice());
-        }
-
-        OrderItem savedItem = orderItemRepository.save(orderItem);
-
-        double newTotal = order.getOrderItems()
-                .stream()
-                .mapToDouble(item -> item.getUnitPrice() * item.getQuantity())
-                .sum();
-        order.setTotalAmount(newTotal);
-        orderRepository.save(order);
-
-        return new OrderItemDTO(savedItem);
+    if (order.getStatus() != OrderStatus.PENDING) {
+        throw new BadRequestException("You can only modify items for orders that are PENDING.");
     }
+
+    if (product.getQuantity() < quantity) {
+        throw new BadRequestException("The quantity you want isn't available.");
+    }
+
+    Optional<OrderItem> existingItem = orderItemRepository.findByOrderAndProduct(order, product);
+
+    OrderItem orderItem;
+    if (existingItem.isPresent()) {
+        orderItem = existingItem.get();
+        orderItem.setQuantity(orderItem.getQuantity() + quantity);
+    } else {
+        orderItem = new OrderItem();
+        orderItem.setOrder(order);
+        orderItem.setProduct(product);
+        orderItem.setQuantity(quantity);
+        orderItem.setUnitPrice(product.getPrice());
+    }
+
+    OrderItem savedItem = orderItemRepository.save(orderItem);
+
+    double newTotal = order.getOrderItems()
+            .stream()
+            .mapToDouble(item -> item.getUnitPrice() * item.getQuantity())
+            .sum();
+    order.setTotalAmount(newTotal);
+    orderRepository.save(order);
+
+    return new OrderItemDTO(savedItem);
+    }
+
 
     @Transactional
-    public OrderItemDTO updateOrderItem(Long orderItemId, Integer newQuantity) {
-        OrderItem orderItem = orderItemRepository.findById(orderItemId)
-                .orElseThrow(() -> new ResourceNotFoundException("This order item doesn't exist"));
+public OrderItemDTO updateOrderItem(Long orderItemId, Integer newQuantity) {
+    OrderItem orderItem = orderItemRepository.findById(orderItemId)
+            .orElseThrow(() -> new ResourceNotFoundException("This order item doesn't exist"));
 
-        Order order = orderItem.getOrder();
+    Order order = orderItem.getOrder();
 
-        if (order.getStatus() != OrderStatus.PENDING) {
-            throw new BadRequestException("You can only modify items for orders that are PENDING.");
-        }
-
-        if (newQuantity <= 0) {
-            throw new BadRequestException("Quantity must be greater than 0");
-        }
-
-        if (newQuantity.equals(orderItem.getQuantity())) {
-            throw new BadRequestException("This quantity is already the real one");
-        }
-
-        Product product = orderItem.getProduct();
-
-        if (newQuantity > product.getQuantity()) {
-            throw new BadRequestException("Quantity you want isn't available");
-        }
-
-        orderItem.setQuantity(newQuantity);
-        orderItem.setTotalPrice(newQuantity, orderItem.getUnitPrice());
-        OrderItem savedOrderItem = orderItemRepository.save(orderItem);
-
-        double newTotal = order.getOrderItems()
-                .stream()
-                .mapToDouble(OrderItem::getTotalPrice)
-                .sum();
-        order.setTotalAmount(newTotal);
-        orderRepository.save(order);
-
-        return new OrderItemDTO(savedOrderItem);
+    if (order.getStatus() != OrderStatus.PENDING) {
+        throw new BadRequestException("You can only modify items for orders that are PENDING.");
     }
+
+    if (newQuantity <= 0) {
+        throw new BadRequestException("Quantity must be greater than 0");
+    }
+
+    if (newQuantity.equals(orderItem.getQuantity())) {
+        throw new BadRequestException("This quantity is already the current one");
+    }
+
+    Product product = orderItem.getProduct();
+
+    if (newQuantity > product.getQuantity()) {
+        throw new BadRequestException("Quantity you want isn't available");
+    }
+
+    orderItem.setQuantity(newQuantity);
+    orderItem.setTotalPrice(orderItem.getUnitPrice() * newQuantity); 
+    OrderItem savedOrderItem = orderItemRepository.save(orderItem);
+
+    double newTotal = order.getOrderItems()
+            .stream()
+            .mapToDouble(OrderItem::getTotalPrice)
+            .sum();
+    order.setTotalAmount(newTotal);
+    orderRepository.save(order);
+
+    return new OrderItemDTO(savedOrderItem);
+}
+
+
 
     public void deleteOrderItem(Long orderItemId) {
         OrderItem orderItem = orderItemRepository.findById(orderItemId)

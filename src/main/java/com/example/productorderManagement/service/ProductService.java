@@ -2,10 +2,12 @@ package com.example.productorderManagement.service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
 import com.example.productorderManagement.dto.ProductDTO;
+import com.example.productorderManagement.exception.BadRequestException;
 import com.example.productorderManagement.exception.ResourceNotFoundException;
 import com.example.productorderManagement.exception.ValidationException;
 import com.example.productorderManagement.model.Category;
@@ -27,21 +29,19 @@ public class ProductService {
         this.categoryRepository = categoryRepository;
     }
 
-    public ProductDTO createProduct(ProductDTO dto, Long categoryId) {
-        Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
-
-        Product product = new Product();
-        product.setName(dto.getProductName());
-        product.setDescription(dto.getDescription());
-        product.setQuantity(dto.getQuantity());
-        product.setPrice(dto.getPrice());
-        product.setCategory(category);
-        product.setCreatedAt(LocalDate.now());
-        product.setUpdatedAt(LocalDate.now());
-
-        Product saved = productRepository.save(product);
-        return new ProductDTO(saved);
+    public ProductDTO addNewProduct(Product product,Long categoryId){
+        boolean exists = productRepository.existsByName(product.getName());
+        if(exists){
+            throw new BadRequestException("this product already exists");
+        }
+        Optional<Category> category =categoryRepository.findById(categoryId);
+        if(!category.isPresent()){
+            throw new ResourceNotFoundException("this category not exist");
+        }
+        product.setCategory(category.get());
+        product.setCreatedAt(java.time.LocalDate.now());
+        Product savedProduct = productRepository.save(product);
+        return new ProductDTO(savedProduct);
     }
 
     public ProductDTO updateProduct(Long productId, ProductDTO dto) {

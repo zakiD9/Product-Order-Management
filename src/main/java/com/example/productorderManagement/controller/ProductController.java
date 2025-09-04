@@ -1,6 +1,7 @@
 package com.example.productorderManagement.controller;
 
 import com.example.productorderManagement.dto.ProductDTO;
+import com.example.productorderManagement.model.Product;
 import com.example.productorderManagement.service.ProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,8 +19,8 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<ProductDTO> createProduct(@RequestBody ProductDTO dto, @RequestParam Long categoryId) {
-        ProductDTO productDTO = productService.createProduct(dto, categoryId);
+    public ResponseEntity<ProductDTO> createProduct(@RequestBody Product product, @RequestParam Long categoryId) {
+        ProductDTO productDTO = productService.addNewProduct(product,categoryId);
         return ResponseEntity.ok(productDTO);
     }
 

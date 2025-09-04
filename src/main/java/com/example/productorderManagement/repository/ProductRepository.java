@@ -9,5 +9,6 @@ import com.example.productorderManagement.model.Product;
 @Repository
 public interface ProductRepository extends JpaRepository<Product,Long>{
     Boolean existsByCategory(Category category);
+    Boolean existsByName(String name);
 }
 
