@@ -1,6 +1,7 @@
 package com.example.productorderManagement.model;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -44,5 +45,9 @@ public class Order {
     @JoinColumn(name = "user_id")
     private User user;
 
-    public Order(){}
+    public Order() {
+    this.orderItems = new ArrayList<>();
+}
+
+    
 }

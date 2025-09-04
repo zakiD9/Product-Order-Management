@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.example.productorderManagement.exception.BadRequestException;
 import com.example.productorderManagement.dto.OrderDTO;
 import com.example.productorderManagement.exception.ResourceNotFoundException;
 import com.example.productorderManagement.exception.UnauthorizedException;
@@ -85,35 +86,40 @@ public class OrderService {
     }
 
     @Transactional
-    public Order createBuyNowOrder(Long userId, Long productId, int quantity) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+public Order createBuyNowOrder(Long userId, Long productId, int quantity) {
+    User user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+    Product product = productRepository.findById(productId)
+            .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        if (product.getQuantity() < quantity) {
-            throw new RuntimeException("Not enough stock available");
-        }
-
-        Order order = new Order();
-        order.setUser(user);
-        order.setStatus(OrderStatus.PENDING);
-        order.setOrderDate(LocalDate.now());
-        orderRepository.save(order);
-
-        OrderItem orderItem = new OrderItem();
-        orderItem.setOrder(order);
-        orderItem.setProduct(product);
-        orderItem.setQuantity(quantity);
-        orderItem.setUnitPrice(product.getPrice());
-        orderItem.setTotalPrice(product.getPrice() * quantity);
-        orderItemRepository.save(orderItem);
-
-        product.setQuantity(product.getQuantity() - quantity);
-        productRepository.save(product);
-
-        return order;
+    if (product.getQuantity() < quantity) {
+        throw new RuntimeException("Not enough stock available");
     }
+
+    Order order = new Order();
+    order.setUser(user);
+    order.setStatus(OrderStatus.PENDING);
+    order.setOrderDate(LocalDate.now());
+    orderRepository.save(order);
+
+    OrderItem orderItem = new OrderItem();
+    orderItem.setOrder(order);
+    orderItem.setProduct(product);
+    orderItem.setQuantity(quantity);
+    orderItem.setUnitPrice(product.getPrice());
+    orderItem.setTotalPrice(product.getPrice() * quantity);
+    orderItemRepository.save(orderItem);
+
+    order.getOrderItems().add(orderItem);
+
+    order.setTotalAmount(orderItem.getTotalPrice());
+    orderRepository.save(order);
+
+    product.setQuantity(product.getQuantity() - quantity);
+    productRepository.save(product);
+
+    return order;
+}
     
     public void cancelOrder(Long orderId, Long userId) {
     Order order = orderRepository.findById(orderId)
@@ -152,13 +158,14 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderDTO checkoutOrder(Long orderId, Long userId) {
+public OrderDTO checkoutOrder(Long orderId, Long userId) {
     Order order = orderRepository.findById(orderId)
             .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
 
     if (!order.getUser().getUserId().equals(userId)) {
         throw new UnauthorizedException("You cannot checkout this order");
     }
+
     if (order.getOrderItems().isEmpty()) {
         throw new ValidationException("Order has no items");
     }
@@ -172,11 +179,25 @@ public class OrderService {
         productRepository.save(product);
     }
 
+    if(order.getStatus() == OrderStatus.PROCESSING){
+        throw new BadRequestException("This order is already checked out");
+    }
+
+    // تحديث حالة الطلب
     order.setStatus(OrderStatus.PROCESSING);
+
+    // حساب المبلغ الإجمالي
+    double total = order.getOrderItems()
+            .stream()
+            .mapToDouble(OrderItem::getTotalPrice)
+            .sum();
+    order.setTotalAmount(total);
+
     orderRepository.save(order);
 
     return new OrderDTO(order);
-    }
+}
+
 
 
 }
