@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.productorderManagement.dto.request.AddressRequest;
 import com.example.productorderManagement.dto.response.AddressResponse;
-import com.example.productorderManagement.model.Address;
 import com.example.productorderManagement.service.AddressService;
 
 @RestController
@@ -28,7 +28,7 @@ public class AddressController {
     }
     
     @PostMapping
-    public ResponseEntity<AddressResponse> addNewAddress(@RequestBody Address address){
+    public ResponseEntity<AddressResponse> addNewAddress(@RequestBody AddressRequest address){
         AddressResponse addedAddress = addressService.addNewAddress(address);
         return ResponseEntity.status(HttpStatus.CREATED).body(addedAddress);
     }
@@ -52,7 +52,7 @@ public class AddressController {
     }
 
     @PutMapping("/{addressId}")
-    public ResponseEntity<AddressResponse> updateAddress(@PathVariable Long addressId, @RequestBody Address updatedAddress) {
+    public ResponseEntity<AddressResponse> updateAddress(@PathVariable Long addressId, @RequestBody AddressRequest updatedAddress) {
         AddressResponse addressDTO = addressService.updateAddress(addressId, updatedAddress);
         return ResponseEntity.ok(addressDTO);
     }
