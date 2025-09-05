@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.example.productorderManagement.dto.UserDTO;
+import com.example.productorderManagement.dto.response.UserResponse;
 import com.example.productorderManagement.model.Address;
 import com.example.productorderManagement.model.Role;
 import com.example.productorderManagement.model.User;
@@ -26,7 +26,7 @@ public class UserService {
     }
 
 
-    public UserDTO createUser(User user ,Long addressId) {
+    public UserResponse createUser(User user ,Long addressId) {
         user.setCreatedAt(LocalDate.now());
 
         if (user.getRole() == null) {
@@ -38,43 +38,43 @@ public class UserService {
             user.getAddresses().add(address);
         }
         User saved = userRepository.save(user);
-        return new UserDTO(saved);
+        return new UserResponse(saved);
     }
 
-    public UserDTO addAddressToUser(Long userId, Long addressId) {
+    public UserResponse addAddressToUser(Long userId, Long addressId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User not found"));
         Address address = addressRepository.findById(addressId)
             .orElseThrow(() -> new RuntimeException("Address not found"));
         user.getAddresses().add(address);
         User saved = userRepository.save(user);
-        return new UserDTO(saved);
+        return new UserResponse(saved);
     }
 
-    public UserDTO removeAddressFromUser(Long userId, Long addressId) {
+    public UserResponse removeAddressFromUser(Long userId, Long addressId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User not found"));
         Address address = addressRepository.findById(addressId)
             .orElseThrow(() -> new RuntimeException("Address not found"));
         user.getAddresses().remove(address);
         User saved = userRepository.save(user);
-        return new UserDTO(saved);
+        return new UserResponse(saved);
     }
 
-    public UserDTO getUserById(Long id) {
+    public UserResponse getUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        return new UserDTO(user);
+        return new UserResponse(user);
     }
 
-    public List<UserDTO> getAllUsers() {
+    public List<UserResponse> getAllUsers() {
         return userRepository.findAll()
                 .stream()
-                .map(UserDTO::new)
+                .map(UserResponse::new)
                 .toList();
     }
 
-    public UserDTO updateUser(Long id, User updatedUser) {
+    public UserResponse updateUser(Long id, User updatedUser) {
         User existing = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -83,7 +83,7 @@ public class UserService {
         if (updatedUser.getPhoneNumber() != null) existing.setPhoneNumber(updatedUser.getPhoneNumber());
 
         User saved = userRepository.save(existing);
-        return new UserDTO(saved);
+        return new UserResponse(saved);
     }
 
 

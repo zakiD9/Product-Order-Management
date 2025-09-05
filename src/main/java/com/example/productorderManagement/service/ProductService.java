@@ -6,7 +6,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import com.example.productorderManagement.dto.ProductDTO;
+import com.example.productorderManagement.dto.response.ProductResponse;
 import com.example.productorderManagement.exception.BadRequestException;
 import com.example.productorderManagement.exception.ResourceNotFoundException;
 import com.example.productorderManagement.exception.ValidationException;
@@ -29,7 +29,7 @@ public class ProductService {
         this.categoryRepository = categoryRepository;
     }
 
-    public ProductDTO addNewProduct(Product product,Long categoryId){
+    public ProductResponse addNewProduct(Product product,Long categoryId){
         boolean exists = productRepository.existsByName(product.getName());
         if(exists){
             throw new BadRequestException("this product already exists");
@@ -41,10 +41,10 @@ public class ProductService {
         product.setCategory(category.get());
         product.setCreatedAt(java.time.LocalDate.now());
         Product savedProduct = productRepository.save(product);
-        return new ProductDTO(savedProduct);
+        return new ProductResponse(savedProduct);
     }
 
-    public ProductDTO updateProduct(Long productId, ProductDTO dto) {
+    public ProductResponse updateProduct(Long productId, ProductResponse dto) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
@@ -54,7 +54,7 @@ public class ProductService {
         product.setUpdatedAt(LocalDate.now());
 
         Product updated = productRepository.save(product);
-        return new ProductDTO(updated);
+        return new ProductResponse(updated);
     }
 
     public void deleteProduct(Long productId) {
@@ -64,16 +64,16 @@ public class ProductService {
         productRepository.deleteById(productId);
     }
 
-    public ProductDTO getProductById(Long productId) {
+    public ProductResponse getProductById(Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
-        return new ProductDTO(product);
+        return new ProductResponse(product);
     }
 
-    public List<ProductDTO> getAllProducts() {
+    public List<ProductResponse> getAllProducts() {
         return productRepository.findAll()
                 .stream()
-                .map(ProductDTO::new)
+                .map(ProductResponse::new)
                 .toList();
     }
 

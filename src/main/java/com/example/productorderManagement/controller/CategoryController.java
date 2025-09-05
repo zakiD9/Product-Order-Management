@@ -1,6 +1,6 @@
 package com.example.productorderManagement.controller;
 
-import com.example.productorderManagement.dto.CategoryDTO;
+import com.example.productorderManagement.dto.response.CategoryResponse;
 import com.example.productorderManagement.model.Category;
 import com.example.productorderManagement.service.CategoryService;
 import org.springframework.http.ResponseEntity;
@@ -20,26 +20,26 @@ public class CategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<CategoryDTO> createCategory(@RequestBody Category category) {
-        CategoryDTO categoryDTO = categoryService.createCategory(category);
+    public ResponseEntity<CategoryResponse> createCategory(@RequestBody Category category) {
+        CategoryResponse categoryDTO = categoryService.createCategory(category);
         return ResponseEntity.ok(categoryDTO);
     }
 
     @GetMapping
-    public ResponseEntity<List<CategoryDTO>> getAllCategories() {
-        List<CategoryDTO> categories = categoryService.getAllCategories();
+    public ResponseEntity<List<CategoryResponse>> getAllCategories() {
+        List<CategoryResponse> categories = categoryService.getAllCategories();
         return ResponseEntity.ok(categories);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CategoryDTO> getCategoryById(@PathVariable Long id) {
-        CategoryDTO categoryDTO = categoryService.getCategoryById(id);
+    public ResponseEntity<CategoryResponse> getCategoryById(@PathVariable Long id) {
+        CategoryResponse categoryDTO = categoryService.getCategoryById(id);
         return ResponseEntity.ok(categoryDTO);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CategoryDTO> updateCategory(@PathVariable Long id, @RequestBody Category categoryDetails) {
-        CategoryDTO categoryDTO = categoryService.updateCategory(id, categoryDetails);
+    public ResponseEntity<CategoryResponse> updateCategory(@PathVariable Long id, @RequestBody Category categoryDetails) {
+        CategoryResponse categoryDTO = categoryService.updateCategory(id, categoryDetails);
         return ResponseEntity.ok(categoryDTO);
     }
 

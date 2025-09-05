@@ -1,6 +1,6 @@
 package com.example.productorderManagement.controller;
 
-import com.example.productorderManagement.dto.OrderItemDTO;
+import com.example.productorderManagement.dto.response.OrderItemResponse;
 import com.example.productorderManagement.service.OrderItemService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,19 +16,19 @@ public class OrderItemController {
     }
 
     @PostMapping
-    public ResponseEntity<OrderItemDTO> addOrderItem(
+    public ResponseEntity<OrderItemResponse> addOrderItem(
             @RequestParam Long productId,
             @RequestParam Long orderId,
             @RequestParam Integer quantity) {
-        OrderItemDTO orderItemDTO = orderItemService.addOrderItem(productId, orderId, quantity);
+        OrderItemResponse orderItemDTO = orderItemService.addOrderItem(productId, orderId, quantity);
         return ResponseEntity.ok(orderItemDTO);
     }
 
     @PutMapping("/{orderItemId}")
-    public ResponseEntity<OrderItemDTO> updateOrderItem(
+    public ResponseEntity<OrderItemResponse> updateOrderItem(
             @PathVariable Long orderItemId,
             @RequestParam Integer quantity) {
-        OrderItemDTO orderItemDTO = orderItemService.updateOrderItem(orderItemId, quantity);
+        OrderItemResponse orderItemDTO = orderItemService.updateOrderItem(orderItemId, quantity);
         return ResponseEntity.ok(orderItemDTO);
     }
 

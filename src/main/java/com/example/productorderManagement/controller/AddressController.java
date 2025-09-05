@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.productorderManagement.dto.AddressDTO;
+import com.example.productorderManagement.dto.response.AddressResponse;
 import com.example.productorderManagement.model.Address;
 import com.example.productorderManagement.service.AddressService;
 
@@ -28,20 +28,20 @@ public class AddressController {
     }
     
     @PostMapping
-    public ResponseEntity<AddressDTO> addNewAddress(@RequestBody Address address){
-        AddressDTO addedAddress = addressService.addNewAddress(address);
+    public ResponseEntity<AddressResponse> addNewAddress(@RequestBody Address address){
+        AddressResponse addedAddress = addressService.addNewAddress(address);
         return ResponseEntity.status(HttpStatus.CREATED).body(addedAddress);
     }
 
     @GetMapping
-    public ResponseEntity<List<AddressDTO>> getAllAddresses(){
-        List<AddressDTO> addresses = addressService.getAllAddresses();
+    public ResponseEntity<List<AddressResponse>> getAllAddresses(){
+        List<AddressResponse> addresses = addressService.getAllAddresses();
         return ResponseEntity.ok(addresses);
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<AddressDTO>> getAddressesByUserId(@PathVariable Long userId) {
-        List<AddressDTO> addresses = addressService.getAddressesByUserId(userId);
+    public ResponseEntity<List<AddressResponse>> getAddressesByUserId(@PathVariable Long userId) {
+        List<AddressResponse> addresses = addressService.getAddressesByUserId(userId);
         return ResponseEntity.ok(addresses);
     }
 
@@ -52,8 +52,8 @@ public class AddressController {
     }
 
     @PutMapping("/{addressId}")
-    public ResponseEntity<AddressDTO> updateAddress(@PathVariable Long addressId, @RequestBody Address updatedAddress) {
-        AddressDTO addressDTO = addressService.updateAddress(addressId, updatedAddress);
+    public ResponseEntity<AddressResponse> updateAddress(@PathVariable Long addressId, @RequestBody Address updatedAddress) {
+        AddressResponse addressDTO = addressService.updateAddress(addressId, updatedAddress);
         return ResponseEntity.ok(addressDTO);
     }
 

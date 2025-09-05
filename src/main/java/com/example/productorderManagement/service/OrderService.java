@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.example.productorderManagement.dto.response.OrderResponse;
 import com.example.productorderManagement.exception.BadRequestException;
-import com.example.productorderManagement.dto.OrderDTO;
 import com.example.productorderManagement.exception.ResourceNotFoundException;
 import com.example.productorderManagement.exception.UnauthorizedException;
 import com.example.productorderManagement.exception.ValidationException;
@@ -38,39 +38,39 @@ public class OrderService {
         this.orderItemRepository = orderItemRepository;
     }
 
-    public List<OrderDTO> getAllOrders() {
+    public List<OrderResponse> getAllOrders() {
     return orderRepository.findAll()
                           .stream()
-                          .map(OrderDTO::new)
+                          .map(OrderResponse::new)
                           .toList();
     }
 
 
-    public List<OrderDTO> getOrdersForUser(Long userId) {
+    public List<OrderResponse> getOrdersForUser(Long userId) {
     userRepository.findById(userId)
            .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
 
     List<Order> orders = orderRepository.findAllByUser_UserId(userId);
     return orders.stream()
-                 .map(OrderDTO::new) 
+                 .map(OrderResponse::new) 
                  .toList();
     }
 
 
-    public OrderDTO getOrderById(Long orderId, Long userId) {
+    public OrderResponse getOrderById(Long orderId, Long userId) {
     Order order = orderRepository.findById(orderId)
             .orElseThrow(() -> new ResourceNotFoundException("Order not found: " + orderId));
 
     if (!order.getUser().getUserId().equals(userId)) {
         throw new UnauthorizedException("You cannot access this order");
     }
-
-    return new OrderDTO(order);
+    
+    return new OrderResponse(order);
     }
 
 
     @Transactional
-    public OrderDTO createOrder(Long userId) {
+    public OrderResponse createOrder(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
         Order order = new Order();
@@ -82,7 +82,7 @@ public class OrderService {
         order.setOrderItems(new java.util.ArrayList<>());
 
         Order saved = orderRepository.save(order);
-        return new OrderDTO(saved);
+        return new OrderResponse(saved);
     }
 
     @Transactional
@@ -139,7 +139,7 @@ public Order createBuyNowOrder(Long userId, Long productId, int quantity) {
     }
 
     @Transactional
-    public OrderDTO updateOrderStatus(Long orderId, OrderStatus newStatus) {
+    public OrderResponse updateOrderStatus(Long orderId, OrderStatus newStatus) {
     Order order = orderRepository.findById(orderId)
             .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
 
@@ -154,11 +154,11 @@ public Order createBuyNowOrder(Long userId, Long productId, int quantity) {
     }
 
     Order saved = orderRepository.save(order);
-    return new OrderDTO(saved);
+    return new OrderResponse(saved);
     }
 
     @Transactional
-public OrderDTO checkoutOrder(Long orderId, Long userId) {
+public OrderResponse checkoutOrder(Long orderId, Long userId) {
     Order order = orderRepository.findById(orderId)
             .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
 
@@ -183,10 +183,8 @@ public OrderDTO checkoutOrder(Long orderId, Long userId) {
         throw new BadRequestException("This order is already checked out");
     }
 
-    // تحديث حالة الطلب
     order.setStatus(OrderStatus.PROCESSING);
 
-    // حساب المبلغ الإجمالي
     double total = order.getOrderItems()
             .stream()
             .mapToDouble(OrderItem::getTotalPrice)
@@ -195,7 +193,7 @@ public OrderDTO checkoutOrder(Long orderId, Long userId) {
 
     orderRepository.save(order);
 
-    return new OrderDTO(order);
+    return new OrderResponse(order);
 }
 
 

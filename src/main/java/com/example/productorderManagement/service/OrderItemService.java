@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import com.example.productorderManagement.dto.OrderItemDTO;
+import com.example.productorderManagement.dto.response.OrderItemResponse;
 import com.example.productorderManagement.exception.BadRequestException;
 import com.example.productorderManagement.exception.ResourceNotFoundException;
 import com.example.productorderManagement.model.Order;
@@ -32,7 +32,7 @@ public class OrderItemService {
         this.productRepository = productRepository;
     }
 
-    public OrderItemDTO addOrderItem(Long productId, Long orderId, Integer quantity) {
+    public OrderItemResponse addOrderItem(Long productId, Long orderId, Integer quantity) {
     Product product = productRepository.findById(productId)
             .orElseThrow(() -> new ResourceNotFoundException("The product doesn't exist."));
     Order order = orderRepository.findById(orderId)
@@ -69,12 +69,12 @@ public class OrderItemService {
     order.setTotalAmount(newTotal);
     orderRepository.save(order);
 
-    return new OrderItemDTO(savedItem);
+    return new OrderItemResponse(savedItem);
     }
 
 
     @Transactional
-public OrderItemDTO updateOrderItem(Long orderItemId, Integer newQuantity) {
+public OrderItemResponse updateOrderItem(Long orderItemId, Integer newQuantity) {
     OrderItem orderItem = orderItemRepository.findById(orderItemId)
             .orElseThrow(() -> new ResourceNotFoundException("This order item doesn't exist"));
 
@@ -109,7 +109,7 @@ public OrderItemDTO updateOrderItem(Long orderItemId, Integer newQuantity) {
     order.setTotalAmount(newTotal);
     orderRepository.save(order);
 
-    return new OrderItemDTO(savedOrderItem);
+    return new OrderItemResponse(savedOrderItem);
 }
 
 

@@ -1,6 +1,6 @@
 package com.example.productorderManagement.controller;
 
-import com.example.productorderManagement.dto.OrderDTO;
+import com.example.productorderManagement.dto.response.OrderResponse;
 import com.example.productorderManagement.model.OrderStatus;
 import com.example.productorderManagement.service.OrderService;
 import org.springframework.http.ResponseEntity;
@@ -19,36 +19,36 @@ public class OrderController {
     }
 
     @GetMapping
-    public ResponseEntity<List<OrderDTO>> getAllOrders() {
-        List<OrderDTO> orders = orderService.getAllOrders();
+    public ResponseEntity<List<OrderResponse>> getAllOrders() {
+        List<OrderResponse> orders = orderService.getAllOrders();
         return ResponseEntity.ok(orders);
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<OrderDTO>> getOrdersForUser(@PathVariable Long userId) {
-        List<OrderDTO> orders = orderService.getOrdersForUser(userId);
+    public ResponseEntity<List<OrderResponse>> getOrdersForUser(@PathVariable Long userId) {
+        List<OrderResponse> orders = orderService.getOrdersForUser(userId);
         return ResponseEntity.ok(orders);
     }
 
     @GetMapping("/{orderId}/user/{userId}")
-    public ResponseEntity<OrderDTO> getOrderById(@PathVariable Long orderId, @PathVariable Long userId) {
-        OrderDTO orderDTO = orderService.getOrderById(orderId, userId);
+    public ResponseEntity<OrderResponse> getOrderById(@PathVariable Long orderId, @PathVariable Long userId) {
+        OrderResponse orderDTO = orderService.getOrderById(orderId, userId);
         return ResponseEntity.ok(orderDTO);
     }
 
     @PostMapping("/user/{userId}")
-    public ResponseEntity<OrderDTO> createOrder(@PathVariable Long userId) {
-        OrderDTO orderDTO = orderService.createOrder(userId);
+    public ResponseEntity<OrderResponse> createOrder(@PathVariable Long userId) {
+        OrderResponse orderDTO = orderService.createOrder(userId);
         return ResponseEntity.ok(orderDTO);
     }
 
     @PostMapping("/buy-now")
-    public ResponseEntity<OrderDTO> createBuyNowOrder(
+    public ResponseEntity<OrderResponse> createBuyNowOrder(
             @RequestParam Long userId,
             @RequestParam Long productId,
             @RequestParam int quantity) {
         var order = orderService.createBuyNowOrder(userId, productId, quantity);
-        return ResponseEntity.ok(new OrderDTO(order));
+        return ResponseEntity.ok(new OrderResponse(order));
     }
 
     @PostMapping("/{orderId}/user/{userId}/cancel")
@@ -58,16 +58,16 @@ public class OrderController {
     }
 
     @PutMapping("/{orderId}/status")
-    public ResponseEntity<OrderDTO> updateOrderStatus(
+    public ResponseEntity<OrderResponse> updateOrderStatus(
             @PathVariable Long orderId,
             @RequestParam OrderStatus status) {
-        OrderDTO orderDTO = orderService.updateOrderStatus(orderId, status);
+        OrderResponse orderDTO = orderService.updateOrderStatus(orderId, status);
         return ResponseEntity.ok(orderDTO);
     }
 
     @PostMapping("/{orderId}/user/{userId}/checkout")
-    public ResponseEntity<OrderDTO> checkoutOrder(@PathVariable Long orderId, @PathVariable Long userId) {
-        OrderDTO orderDTO = orderService.checkoutOrder(orderId, userId);
+    public ResponseEntity<OrderResponse> checkoutOrder(@PathVariable Long orderId, @PathVariable Long userId) {
+        OrderResponse orderDTO = orderService.checkoutOrder(orderId, userId);
         return ResponseEntity.ok(orderDTO);
     }
 }

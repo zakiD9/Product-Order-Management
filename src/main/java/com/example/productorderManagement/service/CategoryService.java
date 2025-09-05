@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.example.productorderManagement.dto.CategoryDTO;
+import com.example.productorderManagement.dto.response.CategoryResponse;
 import com.example.productorderManagement.exception.BadRequestException;
 import com.example.productorderManagement.exception.ResourceNotFoundException;
 import com.example.productorderManagement.model.Category;
@@ -22,29 +22,29 @@ public class CategoryService {
         this.productRepository =productRepository;
     }
 
-    public CategoryDTO createCategory(Category category) {
+    public CategoryResponse createCategory(Category category) {
         boolean exists = categoryRepository.existsByName(category.getName());
         if (exists) {
             throw new BadRequestException("Category with this name already exists");
         }
         Category saved = categoryRepository.save(category);
-        return new CategoryDTO(saved);
+        return new CategoryResponse(saved);
     }
 
-    public List<CategoryDTO> getAllCategories() {
+    public List<CategoryResponse> getAllCategories() {
         return categoryRepository.findAll()
                 .stream()
-                .map(CategoryDTO::new)
+                .map(CategoryResponse::new)
                 .toList();
     }
 
-    public CategoryDTO getCategoryById(Long id) {
+    public CategoryResponse getCategoryById(Long id) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
-        return new CategoryDTO(category);
+        return new CategoryResponse(category);
     }
 
-    public CategoryDTO updateCategory(Long id, Category categoryDetails) {
+    public CategoryResponse updateCategory(Long id, Category categoryDetails) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
 
@@ -52,7 +52,7 @@ public class CategoryService {
         category.setDescription(categoryDetails.getDescription());
 
         Category updated = categoryRepository.save(category);
-        return new CategoryDTO(updated);
+        return new CategoryResponse(updated);
     }
 
     public void deleteCategory(Long id) {

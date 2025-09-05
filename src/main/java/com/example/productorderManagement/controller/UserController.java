@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.productorderManagement.dto.UserDTO;
+import com.example.productorderManagement.dto.response.UserResponse;
 import com.example.productorderManagement.model.User;
 import com.example.productorderManagement.service.UserService;
 
@@ -29,38 +29,38 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserDTO> createUser(
+    public ResponseEntity<UserResponse> createUser(
             @RequestBody User user,
             @RequestParam(required = false) Long addressId) {
-        UserDTO createdUser = userService.createUser(user, addressId);
+        UserResponse createdUser = userService.createUser(user, addressId);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 
     @PostMapping("/{userId}/address/{addressId}")
-    public ResponseEntity<UserDTO> addAddressToUser(
+    public ResponseEntity<UserResponse> addAddressToUser(
             @PathVariable Long userId,
             @PathVariable Long addressId) {
-        UserDTO updatedUser = userService.addAddressToUser(userId, addressId);
+        UserResponse updatedUser = userService.addAddressToUser(userId, addressId);
         return ResponseEntity.ok(updatedUser);
     }
 
     @DeleteMapping("/{userId}/address/{addressId}")
-    public ResponseEntity<UserDTO> removeAddressFromUser(
+    public ResponseEntity<UserResponse> removeAddressFromUser(
             @PathVariable Long userId,
             @PathVariable Long addressId) {
-        UserDTO updatedUser = userService.removeAddressFromUser(userId, addressId);
+        UserResponse updatedUser = userService.removeAddressFromUser(userId, addressId);
         return ResponseEntity.ok(updatedUser);
     }
 
     @GetMapping
-    public ResponseEntity<List<UserDTO>> getAllUsers() {
-        List<UserDTO> users = userService.getAllUsers();
+    public ResponseEntity<List<UserResponse>> getAllUsers() {
+        List<UserResponse> users = userService.getAllUsers();
         return ResponseEntity.ok(users);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
-        UserDTO user = userService.updateUser(id, updatedUser);
+    public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
+        UserResponse user = userService.updateUser(id, updatedUser);
         return ResponseEntity.ok(user);
     }
 

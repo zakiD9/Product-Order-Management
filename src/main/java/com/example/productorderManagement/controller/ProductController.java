@@ -1,6 +1,6 @@
 package com.example.productorderManagement.controller;
 
-import com.example.productorderManagement.dto.ProductDTO;
+import com.example.productorderManagement.dto.response.ProductResponse;
 import com.example.productorderManagement.model.Product;
 import com.example.productorderManagement.service.ProductService;
 import org.springframework.http.ResponseEntity;
@@ -19,14 +19,14 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<ProductDTO> createProduct(@RequestBody Product product, @RequestParam Long categoryId) {
-        ProductDTO productDTO = productService.addNewProduct(product,categoryId);
+    public ResponseEntity<ProductResponse> createProduct(@RequestBody Product product, @RequestParam Long categoryId) {
+        ProductResponse productDTO = productService.addNewProduct(product,categoryId);
         return ResponseEntity.ok(productDTO);
     }
 
     @PutMapping("/{productId}")
-    public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long productId, @RequestBody ProductDTO dto) {
-        ProductDTO productDTO = productService.updateProduct(productId, dto);
+    public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long productId, @RequestBody ProductResponse dto) {
+        ProductResponse productDTO = productService.updateProduct(productId, dto);
         return ResponseEntity.ok(productDTO);
     }
 
@@ -37,14 +37,14 @@ public class ProductController {
     }
 
     @GetMapping("/{productId}")
-    public ResponseEntity<ProductDTO> getProductById(@PathVariable Long productId) {
-        ProductDTO productDTO = productService.getProductById(productId);
+    public ResponseEntity<ProductResponse> getProductById(@PathVariable Long productId) {
+        ProductResponse productDTO = productService.getProductById(productId);
         return ResponseEntity.ok(productDTO);
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductDTO>> getAllProducts() {
-        List<ProductDTO> products = productService.getAllProducts();
+    public ResponseEntity<List<ProductResponse>> getAllProducts() {
+        List<ProductResponse> products = productService.getAllProducts();
         return ResponseEntity.ok(products);
     }
 
