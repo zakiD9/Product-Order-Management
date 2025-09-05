@@ -44,8 +44,8 @@ public class UserService {
     if (userRepository.existsByEmail(userRequest.getEmail())) {
         throw new IllegalStateException("Email already exists");
     }
-    if (userRequest.getPassword() == null || userRequest.getPassword().length() < 6) {
-        throw new IllegalArgumentException("Password must be at least 6 characters");
+    if (userRequest.getPassword() == null || userRequest.getPassword().length() < 8) {
+        throw new IllegalArgumentException("Password must be at least 8 characters");
     }
     User user = modelMapper.map(userRequest, User.class);
         

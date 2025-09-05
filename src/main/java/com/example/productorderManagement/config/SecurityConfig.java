@@ -5,12 +5,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -32,7 +34,15 @@ public class SecurityConfig {
                             "/swagger-resources/**",
                             "/webjars/**"
                     ).permitAll()
+                    .requestMatchers("/api/user/**").hasAnyRole("ADMIN", "CUSTOMER")
+                    .requestMatchers("/api/order/**").hasAnyRole("ADMIN", "CUSTOMER")
+                    .requestMatchers("/api/order-item/**").hasAnyRole("ADMIN", "CUSTOMER")
+                    .requestMatchers("/api/product/**").hasAnyRole("ADMIN", "CUSTOMER")
+                    .requestMatchers("/api/address/**").hasAnyRole("ADMIN", "CUSTOMER")
+                    .requestMatchers("/api/category/**").hasAnyRole("ADMIN", "CUSTOMER")
+
                     .anyRequest().authenticated()
+
             )
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

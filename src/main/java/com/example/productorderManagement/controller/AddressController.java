@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,41 +22,44 @@ import com.example.productorderManagement.service.AddressService;
 @RequestMapping("/api/address")
 public class AddressController {
 
-    private AddressService addressService;
+    private final AddressService addressService;
 
     public AddressController(AddressService addressService){
         this.addressService = addressService;
     }
-    
+
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AddressResponse> addNewAddress(@RequestBody AddressRequest address){
         AddressResponse addedAddress = addressService.addNewAddress(address);
         return ResponseEntity.status(HttpStatus.CREATED).body(addedAddress);
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<AddressResponse>> getAllAddresses(){
         List<AddressResponse> addresses = addressService.getAllAddresses();
         return ResponseEntity.ok(addresses);
     }
 
     @GetMapping("/user/{userId}")
+    @PreAuthorize("hasRole('ADMIN') or #userId == principal.id")
     public ResponseEntity<List<AddressResponse>> getAddressesByUserId(@PathVariable Long userId) {
         List<AddressResponse> addresses = addressService.getAddressesByUserId(userId);
         return ResponseEntity.ok(addresses);
     }
 
     @DeleteMapping("/{addressId}")
+    @PreAuthorize("hasRole('ADMIN') or @addressService.isOwner(#addressId, principal.id)")
     public ResponseEntity<Void> deleteAddress(@PathVariable Long addressId) {
         addressService.deleteAddress(addressId);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{addressId}")
+    @PreAuthorize("hasRole('ADMIN') or @addressService.isOwner(#addressId, principal.id)")
     public ResponseEntity<AddressResponse> updateAddress(@PathVariable Long addressId, @RequestBody AddressRequest updatedAddress) {
         AddressResponse addressDTO = addressService.updateAddress(addressId, updatedAddress);
         return ResponseEntity.ok(addressDTO);
     }
-
-
 }
