@@ -3,6 +3,7 @@ package com.example.productorderManagement.service;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import com.example.productorderManagement.dto.request.UserRequest;
@@ -19,10 +20,12 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
+    private final ModelMapper modelMapper;
 
-    public UserService(UserRepository userRepository, AddressRepository addressRepository) {
+    public UserService(UserRepository userRepository, AddressRepository addressRepository,ModelMapper modelMapper) {
         this.userRepository = userRepository;
         this.addressRepository = addressRepository;
+        this.modelMapper = modelMapper;
     }
 
 
@@ -39,20 +42,16 @@ public class UserService {
     if (userRequest.getPassword() == null || userRequest.getPassword().length() < 6) {
         throw new IllegalArgumentException("Password must be at least 6 characters");
     }
-    User user = new User();
+    User user = modelMapper.map(userRequest, User.class);
+        
         if (addressId != null) {
             Address address = addressRepository.findById(addressId)
                 .orElseThrow(() -> new RuntimeException("Address not found"));
             user.getAddresses().add(address);
         }
-        
-        user.setEmail(userRequest.getEmail());
         user.setRole(Role.CUSTOMER);
-        user.setPassword(userRequest.getPassword());
-        user.setPhoneNumber(userRequest.getPhoneNumber());
-        user.setUsername(userRequest.getUsername());
         user.setCreatedAt(LocalDate.now());
-
+        
         userRepository.save(user);
         return new UserResponse(user);
     }

@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import com.example.productorderManagement.dto.request.ProductRequest;
@@ -23,11 +24,13 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final ModelMapper modelMapper;
 
     public ProductService(ProductRepository productRepository,
-                          CategoryRepository categoryRepository) {
+                          CategoryRepository categoryRepository,ModelMapper modelMapper) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
+        this.modelMapper = modelMapper;
     }
 
     public ProductResponse addNewProduct(ProductRequest productRequest,Long categoryId){
@@ -39,12 +42,7 @@ public class ProductService {
         if(!category.isPresent()){
             throw new ResourceNotFoundException("this category not exist");
         }
-        Product product = new Product();
-        product.setDescription(productRequest.getDescription());
-        product.setName(productRequest.getProductName());
-        product.setPrice(productRequest.getPrice());
-        product.setQuantity(productRequest.getQuantity());
-        product.setCategory(category.get());
+        Product product = modelMapper.map(productRequest,Product.class);
         product.setCreatedAt(java.time.LocalDate.now());
         productRepository.save(product);
         return new ProductResponse(product);
@@ -54,13 +52,9 @@ public class ProductService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
-        product.setName(productRequest.getProductName());
-        product.setDescription(productRequest.getDescription());
-        product.setQuantity(productRequest.getQuantity());
+        modelMapper.map(productRequest, Product.class);
         product.setUpdatedAt(LocalDate.now());
-
-        Product updated = productRepository.save(product);
-        return new ProductResponse(updated);
+        return new ProductResponse(product);
     }
 
     public void deleteProduct(Long productId) {

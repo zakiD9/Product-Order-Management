@@ -1,6 +1,8 @@
 package com.example.productorderManagement.service;
 
 import java.util.List;
+
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import com.example.productorderManagement.dto.request.AddressRequest;
@@ -20,13 +22,14 @@ public class AddressService {
 
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
+    private final ModelMapper modelMapper;
     
 
-    public AddressService(AddressRepository addressRepository,OrderRepository orderRepository,UserRepository userRepository){
+    public AddressService(AddressRepository addressRepository,OrderRepository orderRepository,UserRepository userRepository,ModelMapper modelMapper) {
         this.addressRepository = addressRepository;
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
-
+        this.modelMapper = modelMapper;
     }
 
     public AddressResponse addNewAddress(AddressRequest addressRequest){
@@ -38,11 +41,7 @@ public class AddressService {
         if(exists){
             throw new BadRequestException("this address already exists");
         }
-        Address address = new Address();
-        address.setCity(addressRequest.getCity());
-        address.setStreet(addressRequest.getStreet());
-        address.setState(addressRequest.getState());
-        address.setZipCode(addressRequest.getZipCode());
+        Address address = modelMapper.map(addressRequest, Address.class);
         address.setCreatedAt(java.time.LocalDate.now());
         Address savedAddress = addressRepository.save(address);
 
@@ -79,9 +78,10 @@ public class AddressService {
     }
 
     public AddressResponse updateAddress(Long addressId, AddressRequest AddressRequest) {
-    Address existingAddress = addressRepository.findById(addressId)
-            .orElseThrow(() -> new ResourceNotFoundException("Address not found"));
-
+    Boolean addressIdExists = addressRepository.existsById(addressId);
+    if (!addressIdExists) {
+        throw new ResourceNotFoundException("Address not found with id: " + addressId);
+    }
     boolean exists = addressRepository.existsByStreetAndCityAndStateAndZipCode(
         AddressRequest.getStreet(),
         AddressRequest.getCity(),
@@ -92,11 +92,9 @@ public class AddressService {
     if (exists) {
         throw new BadRequestException("This address already exists");
     }
-    existingAddress.setStreet(AddressRequest.getStreet());
-    existingAddress.setCity(AddressRequest.getCity());
-    existingAddress.setState(AddressRequest.getState());
-    existingAddress.setZipCode(AddressRequest.getZipCode());
-    Address savedAddress = addressRepository.save(existingAddress);
+    Address address = modelMapper.map(AddressRequest, Address.class);
+    address.setAddressId(addressId);
+    Address savedAddress = addressRepository.save(address);
     return new AddressResponse(savedAddress);
 }
 
