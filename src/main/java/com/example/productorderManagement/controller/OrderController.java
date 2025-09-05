@@ -27,28 +27,28 @@ public class OrderController {
     }
 
     @GetMapping("/user/{userId}")
-    @PreAuthorize("hasRole('ADMIN') or #userId == principal.id")
+    @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
     public ResponseEntity<List<OrderResponse>> getOrdersForUser(@PathVariable Long userId) {
         List<OrderResponse> orders = orderService.getOrdersForUser(userId);
         return ResponseEntity.ok(orders);
     }
 
     @GetMapping("/{orderId}/user/{userId}")
-    @PreAuthorize("hasRole('ADMIN') or #userId == principal.id")
+    @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
     public ResponseEntity<OrderResponse> getOrderById(@PathVariable Long orderId, @PathVariable Long userId) {
         OrderResponse orderDTO = orderService.getOrderById(orderId, userId);
         return ResponseEntity.ok(orderDTO);
     }
 
     @PostMapping("/user/{userId}")
-    @PreAuthorize("hasRole('ADMIN') or #userId == principal.id")
+    @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
     public ResponseEntity<OrderResponse> createOrder(@PathVariable Long userId) {
         OrderResponse orderDTO = orderService.createOrder(userId);
         return ResponseEntity.ok(orderDTO);
     }
 
     @PostMapping("/buy-now")
-    @PreAuthorize("hasRole('ADMIN') or #userId == principal.id")
+    @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
     public ResponseEntity<OrderResponse> createBuyNowOrder(
             @RequestParam Long userId,
             @RequestParam Long productId,
@@ -59,7 +59,7 @@ public class OrderController {
 
 
     @PostMapping("/{orderId}/user/{userId}/cancel")
-    @PreAuthorize("hasRole('ADMIN') or #userId == principal.id")
+    @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
     public ResponseEntity<Void> cancelOrder(@PathVariable Long orderId, @PathVariable Long userId) {
         orderService.cancelOrder(orderId, userId);
         return ResponseEntity.noContent().build();
@@ -75,7 +75,7 @@ public class OrderController {
     }
 
     @PostMapping("/{orderId}/user/{userId}/checkout")
-    @PreAuthorize("hasRole('ADMIN') or #userId == principal.id")
+    @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
     public ResponseEntity<OrderResponse> checkoutOrder(@PathVariable Long orderId, @PathVariable Long userId) {
         OrderResponse orderDTO = orderService.checkoutOrder(orderId, userId);
         return ResponseEntity.ok(orderDTO);

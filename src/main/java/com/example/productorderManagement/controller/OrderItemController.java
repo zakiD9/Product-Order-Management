@@ -17,7 +17,7 @@ public class OrderItemController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN') or #userId == principal.id")
+    @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
     public ResponseEntity<OrderItemResponse> addOrderItem(
             @RequestParam Long productId,
             @RequestParam Long orderId,
@@ -27,7 +27,7 @@ public class OrderItemController {
     }
 
     @PutMapping("/{orderItemId}")
-    @PreAuthorize("hasRole('ADMIN') or @orderItemService.isOrderItemOwner(#orderItemId, principal.id)")
+    @PreAuthorize("hasRole('ADMIN') or @orderItemService.isOrderItemOwner(#orderItemId, authentication.principal.id)")
     public ResponseEntity<OrderItemResponse> updateOrderItem(
             @PathVariable Long orderItemId,
             @RequestParam Integer quantity) {
@@ -36,7 +36,7 @@ public class OrderItemController {
     }
 
     @DeleteMapping("/{orderItemId}")
-    @PreAuthorize("hasRole('ADMIN') or @orderItemService.isOrderItemOwner(#orderItemId, principal.id)")
+    @PreAuthorize("hasRole('ADMIN') or @orderItemService.isOrderItemOwner(#orderItemId, authentication.principal.id)")
     public ResponseEntity<Void> deleteOrderItem(@PathVariable Long orderItemId) {
         orderItemService.deleteOrderItem(orderItemId);
         return ResponseEntity.noContent().build();

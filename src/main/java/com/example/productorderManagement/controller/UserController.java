@@ -30,7 +30,7 @@ public class UserController {
     }
 
     @PostMapping("/{userId}/address/{addressId}")
-    @PreAuthorize("hasRole('ADMIN') or #userId == principal.id")
+    @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
     public ResponseEntity<UserResponse> addAddressToUser(
             @PathVariable Long userId,
             @PathVariable Long addressId) {
@@ -39,7 +39,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}/address/{addressId}")
-    @PreAuthorize("hasRole('ADMIN') or #userId == principal.id")
+    @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
     public ResponseEntity<UserResponse> removeAddressFromUser(
             @PathVariable Long userId,
             @PathVariable Long addressId) {
@@ -55,14 +55,14 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or #id == principal.id")
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
     public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @RequestBody UpdateUserRequest updatedUser) {
         UserResponse user = userService.updateUser(id, updatedUser);
         return ResponseEntity.ok(user);
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or #id == principal.id")
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();

@@ -43,21 +43,21 @@ public class AddressController {
     }
 
     @GetMapping("/user/{userId}")
-    @PreAuthorize("hasRole('ADMIN') or #userId == principal.id")
+    @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
     public ResponseEntity<List<AddressResponse>> getAddressesByUserId(@PathVariable Long userId) {
         List<AddressResponse> addresses = addressService.getAddressesByUserId(userId);
         return ResponseEntity.ok(addresses);
     }
 
     @DeleteMapping("/{addressId}")
-    @PreAuthorize("hasRole('ADMIN') or @addressService.isOwner(#addressId, principal.id)")
+    @PreAuthorize("hasRole('ADMIN') or @addressService.isOwner(#addressId, authentication.principal.id)")
     public ResponseEntity<Void> deleteAddress(@PathVariable Long addressId) {
         addressService.deleteAddress(addressId);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{addressId}")
-    @PreAuthorize("hasRole('ADMIN') or @addressService.isOwner(#addressId, principal.id)")
+    @PreAuthorize("hasRole('ADMIN') or @addressService.isOwner(#addressId, authentication.principal.id)")
     public ResponseEntity<AddressResponse> updateAddress(@PathVariable Long addressId, @RequestBody AddressRequest updatedAddress) {
         AddressResponse addressDTO = addressService.updateAddress(addressId, updatedAddress);
         return ResponseEntity.ok(addressDTO);
