@@ -1,7 +1,7 @@
 package com.example.productorderManagement.controller;
 
+import com.example.productorderManagement.dto.request.CategoryRequest;
 import com.example.productorderManagement.dto.response.CategoryResponse;
-import com.example.productorderManagement.model.Category;
 import com.example.productorderManagement.service.CategoryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +20,7 @@ public class CategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<CategoryResponse> createCategory(@RequestBody Category category) {
+    public ResponseEntity<CategoryResponse> createCategory(@RequestBody CategoryRequest category) {
         CategoryResponse categoryDTO = categoryService.createCategory(category);
         return ResponseEntity.ok(categoryDTO);
     }
@@ -38,7 +38,7 @@ public class CategoryController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CategoryResponse> updateCategory(@PathVariable Long id, @RequestBody Category categoryDetails) {
+    public ResponseEntity<CategoryResponse> updateCategory(@PathVariable Long id, @RequestBody CategoryRequest categoryDetails) {
         CategoryResponse categoryDTO = categoryService.updateCategory(id, categoryDetails);
         return ResponseEntity.ok(categoryDTO);
     }

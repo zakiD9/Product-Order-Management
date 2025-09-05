@@ -1,5 +1,6 @@
 package com.example.productorderManagement.controller;
 
+import com.example.productorderManagement.dto.request.ProductRequest;
 import com.example.productorderManagement.dto.response.ProductResponse;
 import com.example.productorderManagement.model.Product;
 import com.example.productorderManagement.service.ProductService;
@@ -19,13 +20,13 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<ProductResponse> createProduct(@RequestBody Product product, @RequestParam Long categoryId) {
+    public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductRequest product, @RequestParam Long categoryId) {
         ProductResponse productDTO = productService.addNewProduct(product,categoryId);
         return ResponseEntity.ok(productDTO);
     }
 
     @PutMapping("/{productId}")
-    public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long productId, @RequestBody ProductResponse dto) {
+    public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long productId, @RequestBody ProductRequest dto) {
         ProductResponse productDTO = productService.updateProduct(productId, dto);
         return ResponseEntity.ok(productDTO);
     }

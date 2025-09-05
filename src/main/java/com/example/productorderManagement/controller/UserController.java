@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.productorderManagement.dto.request.UserRequest;
 import com.example.productorderManagement.dto.response.UserResponse;
 import com.example.productorderManagement.model.User;
 import com.example.productorderManagement.service.UserService;
@@ -30,7 +31,7 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<UserResponse> createUser(
-            @RequestBody User user,
+            @RequestBody UserRequest user,
             @RequestParam(required = false) Long addressId) {
         UserResponse createdUser = userService.createUser(user, addressId);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
@@ -59,7 +60,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
+    public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @RequestBody UserRequest updatedUser) {
         UserResponse user = userService.updateUser(id, updatedUser);
         return ResponseEntity.ok(user);
     }

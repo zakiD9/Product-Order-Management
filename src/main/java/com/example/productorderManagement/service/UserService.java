@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.example.productorderManagement.dto.request.UserRequest;
 import com.example.productorderManagement.dto.response.UserResponse;
 import com.example.productorderManagement.model.Address;
 import com.example.productorderManagement.model.Role;
@@ -12,7 +13,6 @@ import com.example.productorderManagement.model.User;
 import com.example.productorderManagement.repository.AddressRepository;
 import com.example.productorderManagement.repository.UserRepository;
 
-import lombok.RequiredArgsConstructor;
 
 @Service
 public class UserService {
@@ -26,19 +26,34 @@ public class UserService {
     }
 
 
-    public UserResponse createUser(User user ,Long addressId) {
-        user.setCreatedAt(LocalDate.now());
-
-        if (user.getRole() == null) {
-            user.setRole(Role.CUSTOMER);
-        }
+    public UserResponse createUser(UserRequest userRequest ,Long addressId) {
+        if (userRequest.getUsername() == null || userRequest.getUsername().isBlank()) {
+        throw new IllegalArgumentException("Username is required");
+    }
+    if (userRequest.getEmail() == null || userRequest.getEmail().isBlank()) {
+        throw new IllegalArgumentException("Email is required");
+    }
+    if (userRepository.existsByEmail(userRequest.getEmail())) {
+        throw new IllegalStateException("Email already exists");
+    }
+    if (userRequest.getPassword() == null || userRequest.getPassword().length() < 6) {
+        throw new IllegalArgumentException("Password must be at least 6 characters");
+    }
+    User user = new User();
         if (addressId != null) {
             Address address = addressRepository.findById(addressId)
                 .orElseThrow(() -> new RuntimeException("Address not found"));
             user.getAddresses().add(address);
         }
-        User saved = userRepository.save(user);
-        return new UserResponse(saved);
+        user.setEmail(userRequest.getEmail());
+        user.setRole(Role.CUSTOMER);
+        user.setPassword(userRequest.getPassword());
+        user.setPhoneNumber(userRequest.getPhoneNumber());
+        user.setUsername(userRequest.getUsername());
+        user.setCreatedAt(LocalDate.now());
+
+        userRepository.save(user);
+        return new UserResponse(user);
     }
 
     public UserResponse addAddressToUser(Long userId, Long addressId) {
@@ -74,7 +89,7 @@ public class UserService {
                 .toList();
     }
 
-    public UserResponse updateUser(Long id, User updatedUser) {
+    public UserResponse updateUser(Long id, UserRequest updatedUser) {
         User existing = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 

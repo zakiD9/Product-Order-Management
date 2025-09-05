@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.example.productorderManagement.dto.request.CategoryRequest;
 import com.example.productorderManagement.dto.response.CategoryResponse;
 import com.example.productorderManagement.exception.BadRequestException;
 import com.example.productorderManagement.exception.ResourceNotFoundException;
@@ -22,11 +23,14 @@ public class CategoryService {
         this.productRepository =productRepository;
     }
 
-    public CategoryResponse createCategory(Category category) {
-        boolean exists = categoryRepository.existsByName(category.getName());
+    public CategoryResponse createCategory(CategoryRequest categoryRequest) {
+        boolean exists = categoryRepository.existsByName(categoryRequest.getName());
         if (exists) {
             throw new BadRequestException("Category with this name already exists");
         }
+        Category category = new Category();
+        category.setDescription(categoryRequest.getDescription());
+        category.setName(categoryRequest.getName());
         Category saved = categoryRepository.save(category);
         return new CategoryResponse(saved);
     }
@@ -44,7 +48,7 @@ public class CategoryService {
         return new CategoryResponse(category);
     }
 
-    public CategoryResponse updateCategory(Long id, Category categoryDetails) {
+    public CategoryResponse updateCategory(Long id, CategoryRequest categoryDetails) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
 

@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.example.productorderManagement.dto.request.ProductRequest;
 import com.example.productorderManagement.dto.response.ProductResponse;
 import com.example.productorderManagement.exception.BadRequestException;
 import com.example.productorderManagement.exception.ResourceNotFoundException;
@@ -29,8 +30,8 @@ public class ProductService {
         this.categoryRepository = categoryRepository;
     }
 
-    public ProductResponse addNewProduct(Product product,Long categoryId){
-        boolean exists = productRepository.existsByName(product.getName());
+    public ProductResponse addNewProduct(ProductRequest productRequest,Long categoryId){
+        boolean exists = productRepository.existsByName(productRequest.getProductName());
         if(exists){
             throw new BadRequestException("this product already exists");
         }
@@ -38,19 +39,24 @@ public class ProductService {
         if(!category.isPresent()){
             throw new ResourceNotFoundException("this category not exist");
         }
+        Product product = new Product();
+        product.setDescription(productRequest.getDescription());
+        product.setName(productRequest.getProductName());
+        product.setPrice(productRequest.getPrice());
+        product.setQuantity(productRequest.getQuantity());
         product.setCategory(category.get());
         product.setCreatedAt(java.time.LocalDate.now());
-        Product savedProduct = productRepository.save(product);
-        return new ProductResponse(savedProduct);
+        productRepository.save(product);
+        return new ProductResponse(product);
     }
 
-    public ProductResponse updateProduct(Long productId, ProductResponse dto) {
+    public ProductResponse updateProduct(Long productId, ProductRequest productRequest) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
-        product.setName(dto.getProductName());
-        product.setDescription(dto.getDescription());
-        product.setQuantity(dto.getQuantity());
+        product.setName(productRequest.getProductName());
+        product.setDescription(productRequest.getDescription());
+        product.setQuantity(productRequest.getQuantity());
         product.setUpdatedAt(LocalDate.now());
 
         Product updated = productRepository.save(product);
