@@ -14,7 +14,6 @@ public class AddressResponse {
     private String city;
     private String state;
     private String zipCode;
-    private Set<UserResponse> users;
 
     public AddressResponse(Address address) {
         this.addressId = address.getAddressId();
@@ -22,9 +21,5 @@ public class AddressResponse {
         this.city = address.getCity();
         this.state = address.getState();
         this.zipCode = address.getZipCode();
-        this.users = address.getUsers()
-                        .stream()
-                        .map(UserResponse::new)
-                        .collect(Collectors.toSet());
     }
 }

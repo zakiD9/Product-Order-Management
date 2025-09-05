@@ -45,6 +45,7 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("Address not found"));
             user.getAddresses().add(address);
         }
+        
         user.setEmail(userRequest.getEmail());
         user.setRole(Role.CUSTOMER);
         user.setPassword(userRequest.getPassword());
@@ -57,24 +58,30 @@ public class UserService {
     }
 
     public UserResponse addAddressToUser(Long userId, Long addressId) {
-        User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("User not found"));
-        Address address = addressRepository.findById(addressId)
-            .orElseThrow(() -> new RuntimeException("Address not found"));
-        user.getAddresses().add(address);
-        User saved = userRepository.save(user);
-        return new UserResponse(saved);
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
+    Address address = addressRepository.findById(addressId)
+        .orElseThrow(() -> new IllegalArgumentException("Address not found with id: " + addressId));
+    if (user.getAddresses().contains(address)) {
+        throw new IllegalStateException("User already has this address");
     }
+    user.getAddresses().add(address);
+    User saved = userRepository.save(user);
+    return new UserResponse(saved);
+}
 
-    public UserResponse removeAddressFromUser(Long userId, Long addressId) {
-        User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("User not found"));
-        Address address = addressRepository.findById(addressId)
-            .orElseThrow(() -> new RuntimeException("Address not found"));
-        user.getAddresses().remove(address);
-        User saved = userRepository.save(user);
-        return new UserResponse(saved);
+public UserResponse removeAddressFromUser(Long userId, Long addressId) {
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
+    Address address = addressRepository.findById(addressId)
+        .orElseThrow(() -> new IllegalArgumentException("Address not found with id: " + addressId));
+    if (!user.getAddresses().contains(address)) {
+        throw new IllegalStateException("User does not have this address");
     }
+    user.getAddresses().remove(address);
+    User saved = userRepository.save(user);
+    return new UserResponse(saved);
+}
 
     public UserResponse getUserById(Long id) {
         User user = userRepository.findById(id)
