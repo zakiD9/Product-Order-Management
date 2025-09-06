@@ -72,11 +72,20 @@ public class ProductService {
         return new ProductResponse(product);
     }
 
-    public Page<ProductResponse> getAllProducts(int page, int size) {
+    public Page<ProductResponse> getAllProducts(String name, int page, int size) {
     Pageable pageable = PageRequest.of(page, size);
-    return productRepository.findAll(pageable)
-            .map(ProductResponse::new); 
+
+    Page<Product> products;
+
+    if (name != null && !name.isBlank()) {
+        products = productRepository.findByNameContainingIgnoreCase(name, pageable);
+    } else {
+        products = productRepository.findAll(pageable);
     }
+
+    return products.map(ProductResponse::new);
+}
+
 
     @Transactional
     public void adjustStock(Long productId, int delta) {

@@ -3,6 +3,9 @@ package com.example.productorderManagement.service;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.productorderManagement.dto.request.AddressRequest;
@@ -48,12 +51,32 @@ public class AddressService {
     return new AddressResponse(savedAddress);
     }
 
-    public List<AddressResponse> getAllAddresses() {
-    List<Address> addresses = addressRepository.findAll();
-    return addresses.stream()
-            .map(AddressResponse::new)
-            .toList();
+    public Page<AddressResponse> getAllAddresses(
+        String street, String city, String state, String zipCode,
+        int page, int size
+) {
+    Pageable pageable = PageRequest.of(page, size);
+
+    if (street != null && !street.isBlank()) {
+        return addressRepository.findByStreetContainingIgnoreCase(street, pageable)
+                .map(AddressResponse::new);
     }
+    if (city != null && !city.isBlank()) {
+        return addressRepository.findByCityContainingIgnoreCase(city, pageable)
+                .map(AddressResponse::new);
+    }
+    if (state != null && !state.isBlank()) {
+        return addressRepository.findByStateContainingIgnoreCase(state, pageable)
+                .map(AddressResponse::new);
+    }
+    if (zipCode != null && !zipCode.isBlank()) {
+        return addressRepository.findByZipCode(zipCode, pageable)
+                .map(AddressResponse::new);
+    }
+
+    return addressRepository.findAll(pageable).map(AddressResponse::new);
+    }
+
 
     public List<AddressResponse> getAddressesByUserId(Long userId) {
     User user = userRepository.findById(userId)

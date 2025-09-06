@@ -1,5 +1,7 @@
 package com.example.productorderManagement.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -17,5 +19,9 @@ public interface AddressRepository extends JpaRepository<Address,Long>{
         String state,
         String zipCode
     );
+    Page<Address> findByCityContainingIgnoreCase(String city, Pageable pageable);
+    Page<Address> findByStateContainingIgnoreCase(String state, Pageable pageable);
+    Page<Address> findByZipCode(String zipCode, Pageable pageable);
+    Page<Address> findByStreetContainingIgnoreCase(String street, Pageable pageable);
     List <Address> findByUsers(User user);
 }

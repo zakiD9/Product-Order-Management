@@ -1,5 +1,7 @@
 package com.example.productorderManagement.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -10,5 +12,7 @@ import com.example.productorderManagement.model.Product;
 public interface ProductRepository extends JpaRepository<Product,Long>{
     Boolean existsByCategory(Category category);
     Boolean existsByName(String name);
+    Page<Product> findByNameContainingIgnoreCase(String name, Pageable pageable);
+
 }
 

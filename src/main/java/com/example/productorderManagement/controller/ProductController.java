@@ -52,10 +52,11 @@ public class ProductController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('CUSTOMER')")
-    public ResponseEntity<Page<ProductResponse>> getAllProducts(
+    public Page<ProductResponse> getAllProducts(
+        @RequestParam(required = false) String name,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size) {
-    return ResponseEntity.ok(productService.getAllProducts(page, size));
+    return productService.getAllProducts(name, page, size);
     }
 
     @PatchMapping("/{productId}/stock")

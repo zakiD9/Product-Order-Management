@@ -51,10 +51,11 @@ public class UserController {
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<UserResponse>> getAllUsers(
+        @RequestParam(required = false) String name,
         @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int size) {
+        @RequestParam(defaultValue = "10") int size){
 
-    Page<UserResponse> users = userService.getAllUsers(page, size);
+    Page<UserResponse> users = userService.getAllUsers(name, page, size);
     return ResponseEntity.ok(users);
     }
 

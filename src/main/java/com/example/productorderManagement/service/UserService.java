@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Pageable;
@@ -97,11 +96,18 @@ public UserResponse removeAddressFromUser(Long userId, Long addressId) {
         return new UserResponse(user);
     }
 
-    public Page<UserResponse> getAllUsers(int page, int size) {
-    Pageable pageable = PageRequest.of(page, size, Sort.by("username").ascending());
+    public Page<UserResponse> getAllUsers(String name,int page, int size) {
+    Pageable pageable = PageRequest.of(page, size);
 
-    return userRepository.findAll(pageable)
-                         .map(UserResponse::new);
+    Page<User> users;
+
+    if (name != null && !name.isBlank()) {
+        users = userRepository.findByUsernameContainingIgnoreCase(name, pageable);
+    } else {
+        users = userRepository.findAll(pageable);
+    }
+
+    return users.map(UserResponse::new);
     }
 
     public UserResponse updateUser(Long id, UpdateUserRequest updatedUser) {
