@@ -18,6 +18,8 @@ import com.example.productorderManagement.dto.request.AddressRequest;
 import com.example.productorderManagement.dto.response.AddressResponse;
 import com.example.productorderManagement.service.AddressService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/address")
 public class AddressController {
@@ -30,7 +32,7 @@ public class AddressController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<AddressResponse> addNewAddress(@RequestBody AddressRequest address){
+    public ResponseEntity<AddressResponse> addNewAddress(@Valid @RequestBody AddressRequest address){
         AddressResponse addedAddress = addressService.addNewAddress(address);
         return ResponseEntity.status(HttpStatus.CREATED).body(addedAddress);
     }
@@ -58,7 +60,7 @@ public class AddressController {
 
     @PutMapping("/{addressId}")
     @PreAuthorize("hasRole('ADMIN') or @addressService.isOwner(#addressId, authentication.principal.id)")
-    public ResponseEntity<AddressResponse> updateAddress(@PathVariable Long addressId, @RequestBody AddressRequest updatedAddress) {
+    public ResponseEntity<AddressResponse> updateAddress(@PathVariable Long addressId,@Valid @RequestBody AddressRequest updatedAddress) {
         AddressResponse addressDTO = addressService.updateAddress(addressId, updatedAddress);
         return ResponseEntity.ok(addressDTO);
     }

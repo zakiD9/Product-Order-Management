@@ -19,6 +19,8 @@ import com.example.productorderManagement.dto.request.UpdateUserRequest;
 import com.example.productorderManagement.dto.response.UserResponse;
 import com.example.productorderManagement.service.UserService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
@@ -56,7 +58,7 @@ public class UserController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
-    public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @RequestBody UpdateUserRequest updatedUser) {
+    public ResponseEntity<UserResponse> updateUser(@PathVariable Long id,@Valid @RequestBody UpdateUserRequest updatedUser) {
         UserResponse user = userService.updateUser(id, updatedUser);
         return ResponseEntity.ok(user);
     }

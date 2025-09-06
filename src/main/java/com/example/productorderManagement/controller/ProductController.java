@@ -3,6 +3,9 @@ package com.example.productorderManagement.controller;
 import com.example.productorderManagement.dto.request.ProductRequest;
 import com.example.productorderManagement.dto.response.ProductResponse;
 import com.example.productorderManagement.service.ProductService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -21,14 +24,14 @@ public class ProductController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductRequest product, @RequestParam Long categoryId) {
+    public ResponseEntity<ProductResponse> createProduct(@Valid @RequestBody ProductRequest product, @RequestParam Long categoryId) {
         ProductResponse productDTO = productService.addNewProduct(product,categoryId);
         return ResponseEntity.ok(productDTO);
     }
 
     @PutMapping("/{productId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long productId, @RequestBody ProductRequest dto) {
+    public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long productId,@Valid @RequestBody ProductRequest dto) {
         ProductResponse productDTO = productService.updateProduct(productId, dto);
         return ResponseEntity.ok(productDTO);
     }

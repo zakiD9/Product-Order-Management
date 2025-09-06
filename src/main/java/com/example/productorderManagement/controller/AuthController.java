@@ -8,6 +8,9 @@ import com.example.productorderManagement.exception.CustomBadCredentialsExceptio
 import com.example.productorderManagement.model.User;
 import com.example.productorderManagement.repository.UserRepository;
 import com.example.productorderManagement.service.UserService;
+
+import jakarta.validation.Valid;
+
 import com.example.productorderManagement.Security.JwtUtil;
 
 import java.util.Optional;
@@ -38,7 +41,7 @@ public class AuthController {
     }
 
    @PostMapping("/login")
-public AuthResponse login(@RequestBody LoginRequest request) {
+public AuthResponse login(@Valid @RequestBody LoginRequest request) {
     Authentication authentication;
     try {
         authentication = authenticationManager.authenticate(
@@ -65,7 +68,7 @@ public AuthResponse login(@RequestBody LoginRequest request) {
 
     @PostMapping("/register")
     public ResponseEntity<UserResponse> register(
-        @RequestBody UserRequest user,
+        @Valid @RequestBody UserRequest user,
         @RequestParam(required = false) Long addressId) {
     UserResponse createdUser = userService.createUser(user, addressId);
     return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);

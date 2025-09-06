@@ -3,6 +3,9 @@ package com.example.productorderManagement.controller;
 import com.example.productorderManagement.dto.request.CategoryRequest;
 import com.example.productorderManagement.dto.response.CategoryResponse;
 import com.example.productorderManagement.service.CategoryService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -27,14 +30,14 @@ public class CategoryController {
     }
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CategoryResponse> createCategory(@RequestBody CategoryRequest category) {
+    public ResponseEntity<CategoryResponse> createCategory(@Valid @RequestBody CategoryRequest category) {
         CategoryResponse categoryDTO = categoryService.createCategory(category);
         return ResponseEntity.ok(categoryDTO);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CategoryResponse> updateCategory(@PathVariable Long id, @RequestBody CategoryRequest categoryDetails) {
+    public ResponseEntity<CategoryResponse> updateCategory(@PathVariable Long id,@Valid @RequestBody CategoryRequest categoryDetails) {
         CategoryResponse categoryDTO = categoryService.updateCategory(id, categoryDetails);
       return ResponseEntity.ok(categoryDTO);
     }
