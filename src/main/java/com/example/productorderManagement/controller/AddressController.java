@@ -40,7 +40,7 @@ public class AddressController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('CUSTOMER')")
     public ResponseEntity<Page<AddressResponse>> getAllAddresses(
         @RequestParam(required = false) String street,
         @RequestParam(required = false) String city,
