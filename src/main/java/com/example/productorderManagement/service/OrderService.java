@@ -73,6 +73,10 @@ public class OrderService {
     public OrderResponse createOrder(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+    if (orderRepository.existsByUserIdAndStatus(userId, OrderStatus.PENDING)) {
+    throw new BadRequestException("User already has a pending order");
+    }
+
         Order order = new Order();
         order.setUser(user);
         order.setStatus(OrderStatus.PENDING);
