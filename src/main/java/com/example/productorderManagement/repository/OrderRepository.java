@@ -13,5 +13,5 @@ import com.example.productorderManagement.model.OrderStatus;
 public interface OrderRepository extends JpaRepository<Order,Long>{
     Boolean existsByAddress(Address address);
     List<Order> findAllByUser_UserId(Long userId);
-    Boolean existsByUserIdAndStatus(Long userId ,OrderStatus status);
+    Boolean existsByUser_UserIdAndStatus(Long userId ,OrderStatus status);
 }
