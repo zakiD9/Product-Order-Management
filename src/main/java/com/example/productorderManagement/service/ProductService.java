@@ -4,6 +4,9 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -35,6 +38,7 @@ public class ProductService {
         this.modelMapper = modelMapper;
     }
 
+    @CacheEvict(value = "products", allEntries = true)
     public ProductResponse addNewProduct(ProductRequest productRequest,Long categoryId){
         boolean exists = productRepository.existsByName(productRequest.getProductName());
         if(exists){
@@ -50,6 +54,10 @@ public class ProductService {
         return new ProductResponse(product);
     }
 
+
+    @Transactional
+    @CachePut(value = "products", key = "#productId") 
+    @CacheEvict(value = "products", key = "'page:' + '*'", allEntries = true) 
     public ProductResponse updateProduct(Long productId, ProductRequest productRequest) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
@@ -66,12 +74,14 @@ public class ProductService {
         productRepository.deleteById(productId);
     }
 
+    @Cacheable(value = "products", key = "#productId")
     public ProductResponse getProductById(Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
         return new ProductResponse(product);
     }
 
+    @Cacheable(value = "products", key = "'page:' + #page + ':size:' + #size + ':name:' + #name")
     public Page<ProductResponse> getAllProducts(String name, int page, int size) {
     Pageable pageable = PageRequest.of(page, size);
 
@@ -88,7 +98,9 @@ public class ProductService {
 
 
     @Transactional
-    public void adjustStock(Long productId, int delta) {
+    @CachePut(value = "products", key = "#productId") 
+    @CacheEvict(value = "products", key = "'page:' + '*'", allEntries = true) 
+   public void adjustStock(Long productId, int delta) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 

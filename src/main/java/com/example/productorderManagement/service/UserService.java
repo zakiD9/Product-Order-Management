@@ -3,6 +3,9 @@ package com.example.productorderManagement.service;
 import java.time.LocalDate;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -36,6 +39,7 @@ public class UserService {
     }
 
 
+    @CacheEvict(value = "users", allEntries = true)
     public UserResponse createUser(UserRequest userRequest ,Long addressId) {
         if (userRequest.getUsername() == null || userRequest.getUsername().isBlank()) {
         throw new IllegalArgumentException("Username is required");
@@ -64,6 +68,8 @@ public class UserService {
         return new UserResponse(user);
     }
 
+     @CachePut(value = "users", key = "#userId")
+    @CacheEvict(value = "users", key = "'page:' + '*'", allEntries = true)
     public UserResponse addAddressToUser(Long userId, Long addressId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
@@ -77,7 +83,9 @@ public class UserService {
     return new UserResponse(saved);
 }
 
-public UserResponse removeAddressFromUser(Long userId, Long addressId) {
+    @CachePut(value = "users", key = "#userId")
+    @CacheEvict(value = "users", key = "'page:' + '*'", allEntries = true)
+    public UserResponse removeAddressFromUser(Long userId, Long addressId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
     Address address = addressRepository.findById(addressId)
@@ -90,12 +98,14 @@ public UserResponse removeAddressFromUser(Long userId, Long addressId) {
     return new UserResponse(saved);
 }
 
+    @Cacheable(value = "users", key = "#id")
     public UserResponse getUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         return new UserResponse(user);
     }
 
+    @Cacheable(value = "users", key = "'page:' + #page + ':size:' + #size + ':name:' + #name")
     public Page<UserResponse> getAllUsers(String name,int page, int size) {
     Pageable pageable = PageRequest.of(page, size);
 
@@ -110,6 +120,7 @@ public UserResponse removeAddressFromUser(Long userId, Long addressId) {
     return users.map(UserResponse::new);
     }
 
+    @CachePut(value = "users", key = "#id")
     public UserResponse updateUser(Long id, UpdateUserRequest updatedUser) {
         User existing = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));

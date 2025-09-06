@@ -2,6 +2,9 @@ package com.example.productorderManagement.service;
 
 import java.time.LocalDate;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -41,6 +44,7 @@ public class OrderService {
         this.orderItemRepository = orderItemRepository;
     }
 
+    @Cacheable(value = "orders", key = "'page:' + #page + ':size:' + #size")
     public Page<OrderResponse> getAllOrders(int page, int size) {
     Pageable pageable = PageRequest.of(page, size, Sort.by("orderDate").descending());
 
@@ -49,13 +53,14 @@ public class OrderService {
     }
 
 
+    @Cacheable(value = "orders", key = "'user:' + #userId + ':page:' + #page + ':size:' + #size")
     public Page<OrderResponse> getOrdersForUser(Long userId, int page, int size) {
     Pageable pageable = PageRequest.of(page, size);
     return orderRepository.findByUser_UserId(userId, pageable)
                           .map(OrderResponse::new);
     }
 
-
+    @Cacheable(value = "orders", key = "#orderId")
     public OrderResponse getOrderById(Long orderId, Long userId) {
     Order order = orderRepository.findById(orderId)
             .orElseThrow(() -> new ResourceNotFoundException("Order not found: " + orderId));
@@ -69,6 +74,7 @@ public class OrderService {
 
 
     @Transactional
+    @CacheEvict(value = "orders", allEntries = true)
     public OrderResponse createOrder(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
@@ -89,7 +95,8 @@ public class OrderService {
     }
 
     @Transactional
-public Order createBuyNowOrder(Long userId, Long productId, int quantity) {
+    @CacheEvict(value = "orders", allEntries = true)
+    public Order createBuyNowOrder(Long userId, Long productId, int quantity) {
     User user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User not found"));
     Product product = productRepository.findById(productId)
@@ -124,6 +131,8 @@ public Order createBuyNowOrder(Long userId, Long productId, int quantity) {
     return order;
 }
     
+    @Transactional
+    @CacheEvict(value = "orders", allEntries = true)
     public void cancelOrder(Long orderId, Long userId) {
     Order order = orderRepository.findById(orderId)
             .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
@@ -142,6 +151,8 @@ public Order createBuyNowOrder(Long userId, Long productId, int quantity) {
     }
 
     @Transactional
+    @CachePut(value = "orders", key = "#orderId") 
+    @CacheEvict(value = "orders", key = "'user:' + #orderId") 
     public OrderResponse updateOrderStatus(Long orderId, OrderStatus newStatus) {
     Order order = orderRepository.findById(orderId)
             .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
@@ -161,7 +172,9 @@ public Order createBuyNowOrder(Long userId, Long productId, int quantity) {
     }
 
     @Transactional
-public OrderResponse checkoutOrder(Long orderId, Long userId) {
+    @CachePut(value = "orders", key = "#orderId")
+    @CacheEvict(value = "orders", key = "'user:' + #userId + ':page:' + '*'", allEntries = true)
+    public OrderResponse checkoutOrder(Long orderId, Long userId) {
     Order order = orderRepository.findById(orderId)
             .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
 

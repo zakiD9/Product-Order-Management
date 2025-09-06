@@ -3,6 +3,9 @@ package com.example.productorderManagement.service;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -35,6 +38,7 @@ public class AddressService {
         this.modelMapper = modelMapper;
     }
 
+    @CacheEvict(value = "addresses", allEntries = true)
     public AddressResponse addNewAddress(AddressRequest addressRequest){
         boolean exists = addressRepository.existsByStreetAndCityAndStateAndZipCode(
         addressRequest.getStreet(),
@@ -51,6 +55,7 @@ public class AddressService {
     return new AddressResponse(savedAddress);
     }
 
+    @Cacheable(value = "addresses")
     public Page<AddressResponse> getAllAddresses(
         String street, String city, String state, String zipCode,
         int page, int size
@@ -78,6 +83,7 @@ public class AddressService {
     }
 
 
+    @Cacheable(value = "addresses", key = "#userId")
     public List<AddressResponse> getAddressesByUserId(Long userId) {
     User user = userRepository.findById(userId)
             .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
@@ -89,7 +95,7 @@ public class AddressService {
             .toList();
     }
 
-
+    @CacheEvict(value = "addresses", allEntries = true)
     public void deleteAddress(Long addressId){
         Address address = addressRepository.findById(addressId)
         .orElseThrow(() -> new ResourceNotFoundException("Address not found"));
@@ -100,6 +106,7 @@ public class AddressService {
         addressRepository.deleteById(addressId);
     }
 
+    @CachePut(value = "addresses", key = "#addressId")
     public AddressResponse updateAddress(Long addressId, AddressRequest AddressRequest) {
     Boolean addressIdExists = addressRepository.existsById(addressId);
     if (!addressIdExists) {

@@ -3,6 +3,9 @@ package com.example.productorderManagement.service;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.example.productorderManagement.dto.request.CategoryRequest;
@@ -26,6 +29,7 @@ public class CategoryService {
         this.modelMapper = modelMapper;
     }
 
+    @CacheEvict(value = "categories" , allEntries = true)
     public CategoryResponse createCategory(CategoryRequest categoryRequest) {
         boolean exists = categoryRepository.existsByName(categoryRequest.getName());
         if (exists) {
@@ -36,6 +40,7 @@ public class CategoryService {
         return new CategoryResponse(category);
     }
 
+    @Cacheable(value = "categories")
     public List<CategoryResponse> getAllCategories() {
         return categoryRepository.findAll()
                 .stream()
@@ -43,12 +48,14 @@ public class CategoryService {
                 .toList();
     }
 
+    @Cacheable(value = "categories", key = "#id")
     public CategoryResponse getCategoryById(Long id) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
         return new CategoryResponse(category);
     }
 
+    @CachePut( value ="categories" , key = "#id")
     public CategoryResponse updateCategory(Long id, CategoryRequest categoryDetails) {
         Boolean categoryExist = categoryRepository.existsById(id);
         if (!categoryExist) {
@@ -63,6 +70,7 @@ public class CategoryService {
         return new CategoryResponse(category);
     }
 
+    @CacheEvict(value = "categories" , key = "#id")
     public void deleteCategory(Long id) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));

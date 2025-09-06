@@ -2,6 +2,8 @@ package com.example.productorderManagement.service;
 
 import java.util.Optional;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 
 import com.example.productorderManagement.dto.response.OrderItemResponse;
@@ -32,6 +34,7 @@ public class OrderItemService {
         this.productRepository = productRepository;
     }
 
+    @CacheEvict(value = "order-items" , key = "#orderId")
     public OrderItemResponse addOrderItem(Long productId, Long orderId, Integer quantity) {
     Product product = productRepository.findById(productId)
             .orElseThrow(() -> new ResourceNotFoundException("The product doesn't exist."));
@@ -74,7 +77,8 @@ public class OrderItemService {
 
 
     @Transactional
-public OrderItemResponse updateOrderItem(Long orderItemId, Integer newQuantity) {
+    @CachePut(value = "order-items" , key = "#orderItemId")
+    public OrderItemResponse updateOrderItem(Long orderItemId, Integer newQuantity) {
     OrderItem orderItem = orderItemRepository.findById(orderItemId)
             .orElseThrow(() -> new ResourceNotFoundException("This order item doesn't exist"));
 
@@ -113,7 +117,7 @@ public OrderItemResponse updateOrderItem(Long orderItemId, Integer newQuantity) 
 }
 
 
-
+    @CacheEvict(value = "order-items" , key = "#orderItemId")
     public void deleteOrderItem(Long orderItemId) {
         OrderItem orderItem = orderItemRepository.findById(orderItemId)
                 .orElseThrow(() -> new ResourceNotFoundException("OrderItem not found with id: " + orderItemId));
