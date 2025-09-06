@@ -1,10 +1,12 @@
 package com.example.productorderManagement.service;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.productorderManagement.dto.request.ProductRequest;
@@ -70,11 +72,10 @@ public class ProductService {
         return new ProductResponse(product);
     }
 
-    public List<ProductResponse> getAllProducts() {
-        return productRepository.findAll()
-                .stream()
-                .map(ProductResponse::new)
-                .toList();
+    public Page<ProductResponse> getAllProducts(int page, int size) {
+    Pageable pageable = PageRequest.of(page, size);
+    return productRepository.findAll(pageable)
+            .map(ProductResponse::new); 
     }
 
     @Transactional

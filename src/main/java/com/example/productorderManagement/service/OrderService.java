@@ -1,8 +1,11 @@
 package com.example.productorderManagement.service;
 
 import java.time.LocalDate;
-import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.example.productorderManagement.dto.response.OrderResponse;
@@ -38,22 +41,18 @@ public class OrderService {
         this.orderItemRepository = orderItemRepository;
     }
 
-    public List<OrderResponse> getAllOrders() {
-    return orderRepository.findAll()
-                          .stream()
-                          .map(OrderResponse::new)
-                          .toList();
+    public Page<OrderResponse> getAllOrders(int page, int size) {
+    Pageable pageable = PageRequest.of(page, size, Sort.by("orderDate").descending());
+
+    return orderRepository.findAll(pageable)
+                          .map(OrderResponse::new);
     }
 
 
-    public List<OrderResponse> getOrdersForUser(Long userId) {
-    userRepository.findById(userId)
-           .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
-
-    List<Order> orders = orderRepository.findAllByUser_UserId(userId);
-    return orders.stream()
-                 .map(OrderResponse::new) 
-                 .toList();
+    public Page<OrderResponse> getOrdersForUser(Long userId, int page, int size) {
+    Pageable pageable = PageRequest.of(page, size);
+    return orderRepository.findByUser_UserId(userId, pageable)
+                          .map(OrderResponse::new);
     }
 
 
